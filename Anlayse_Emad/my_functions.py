@@ -1,23 +1,30 @@
 import seaborn as sns
+import matplotlib.pyplot as plt
+
+ax = plt.subplots()
 
 def counts_in_percentages(column):
     counts =  column.value_counts()
-    return counts/counts.sum()
+    return counts/counts.sum()*100
 
 
 
-def annotate_barplot(ax, size = 10):
-    for p in ax.patches:
-        height = p.get_height()
-        ax.annotate('{:.2f}%'.format(height),
-                    (p.get_x() + p.get_width() / 2., height),
-                    ha='center', va='center',
-                    xytext=(0, 10), textcoords='offset points',
-                    fontsize=size, color='black')
+import pandas as pd
 
-def my_sns_barplot(column, ax_i = 0, ax_j = 0, xlabel = "", ylabel = "", xrotation = 0, yrotation = 0, annotate = False, annotate_size = 10, rotation = 0):
-    sns.barplot(x=column.index, y=column.values, ax = ax[ax_i][ax_j])
-    ax[ax_i][ax_j].set_xlabel(xlabel)
-    ax[ax_i][ax_j].set_xticklabels(ax[ax_i][ax_j].get_xticklabels(), rotation=rotation)
-    if annotate == True:
-        annotate_barplot(ax[ax_i][ax_j], size=annotate_size)
+def difference_in_time(df, date1, date2, new_column_name, time_unit):
+    df[date1] = pd.to_datetime(df[date1], format='%Y-%m-%d %H:%M:%S')
+    df[date2] = pd.to_datetime(df[date2], format='%Y-%m-%d %H:%M:%S')
+    
+    if time_unit == 'day':
+        df[new_column_name] = (df[date2] - df[date1]).dt.days
+    elif time_unit == 'month':
+        df[new_column_name] = (df[date2].dt.year - df[date1].dt.year) * 12 + (df[date2].dt.month - df[date1].dt.month)
+    elif time_unit == 'year':
+        df[new_column_name] = (df[date2].dt.year - df[date1].dt.year)
+    elif time_unit == 'week':
+        df[new_column_name] = (df[date2] - df[date1]).dt.total_seconds() / (24 * 60 * 60 * 7)
+    else:
+        print('Invalid time unit. Please choose from day, month, year, or week.')
+        return
+    
+    return df
