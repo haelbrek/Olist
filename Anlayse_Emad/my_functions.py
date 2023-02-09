@@ -28,3 +28,29 @@ def difference_in_time(df, date1, date2, new_column_name, time_unit):
         return
     
     return df
+
+
+
+import matplotlib.pyplot as plt
+
+def plot_two_plots(df, title1, title2, xlabel1, xlabel2, fontsize, rotation):
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,4))
+    
+    df_grouped = df.groupby(df['order_purchase_timestamp'].dt.date).mean()
+    ax1.plot(df_grouped.index, df_grouped['diff_in_day'])
+    ax1.set_title(title1, fontsize=fontsize)
+    ax1.set_xlabel(xlabel1, fontsize=fontsize)
+    ax1.set_ylabel('diff_in_day', fontsize=fontsize)
+    #ax1.set_xticks(fontsize=fontsize, rotation=rotation)
+    #ax1.set_yticks(fontsize=fontsize)
+
+    df_2017 = df[df['order_purchase_timestamp'].dt.year >= 2017]
+    df_grouped = df_2017.groupby(df_2017['order_purchase_timestamp'].dt.date).mean()
+    ax2.plot(df_grouped.index, df_grouped['diff_in_day'])
+    ax2.axhline(y=1, color='red', linestyle='--')
+    ax2.set_title(title2, fontsize=fontsize)
+    ax2.set_xlabel(xlabel2, fontsize=fontsize)
+    ax2.set_ylabel('diff_in_day', fontsize=fontsize)
+    #ax2.set_xticks(fontsize=fontsize, rotation=rotation)
+    #ax2.set_yticks(fontsize=fontsize)    
+    plt.show()
